@@ -1,5 +1,6 @@
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
+from height_map import HillGrid
 
 # grass_texture = load_texture("assests/grass.png")
 
@@ -13,6 +14,7 @@ MAX_HEIGHT = 60
 
 floor_set = set()
 
+grass_texture = load_texture("assets/grass.png")
 punch_sound = Audio("assets/punch.wav", autoplay=False, loop=False)
 
 def update():
@@ -26,15 +28,15 @@ def update():
         player.y = MAX_HEIGHT
         
 class Voxel(Button):
-    def __init__(self, position):
+    def __init__(self, position, texture=grass_texture):
         super().__init__(
             parent=scene,
             position=position,
-            model="cube",
-            texture="white_cube",
+            model="assets/block",
+            texture=texture,
             origin_y=0.5,
             color=color.color(0,0, random.uniform(0.9,1)),
-            scale=1
+            scale=0.5
         )
     
 
@@ -43,7 +45,7 @@ def generate_floor():
         for z in range(-16, 16):
             if (x, z) not in floor_set:
                 floor_set.add((x,z))
-                Voxel(position=(x,0,z))
+                Voxel(position=(x,0,z), texture=grass_texture)
 
 def input(key):
     if key == "left mouse down":
@@ -58,7 +60,7 @@ def input(key):
         hitinfo = raycast(camera.world_position, camera.forward, distance=100)
 
         if hitinfo.hit:
-            Voxel(position=hitinfo.entity.position + hitinfo.normal)
+            Voxel(position=hitinfo.entity.position + hitinfo.normal, texture=grass_texture)
 
 
 generate_floor()
